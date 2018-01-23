@@ -2,12 +2,13 @@
 package birthday
 
 import (
+    "context"
 	"time"
-	"log"
     "os"
     "encoding/csv"
 
-    common "github.com/hamidzia/rest-api/common"
+    common "github.com/hamidzia/tracky/api/common"
+    log "google.golang.org/appengine/log"
 )
 
 type Birthday struct {
@@ -16,7 +17,7 @@ type Birthday struct {
 }
 // Get all the birthdays from data file.
 // path: comma separated CSV file (Full_Name,Date_Of_Birth)
-func ReadBirthdays(path string)([]Birthday, error) {
+func ReadBirthdays(c context.Context, path string)([]Birthday, error) {
     f, err := os.Open(path)
     if err != nil {
         return nil, err
@@ -28,13 +29,13 @@ func ReadBirthdays(path string)([]Birthday, error) {
         return nil, err
     }
 
-    log.Printf("Total Records: %d", len(lines))
+    log.Infof(c, "Total Records: %d", len(lines))
 
     var birthdays []Birthday
     for _, line := range lines {
         t, err := time.Parse(common.DatePattern, line[1])
         if err != nil {
-            log.Printf("%v", err)
+            log.Infof(c, "%v", err)
             continue
         }
         
